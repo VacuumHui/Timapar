@@ -8,7 +8,7 @@
 #include <string>
 #include <algorithm>
 #include <chrono>
-#include <cstdio>  // Обязательный заголовочный файл для sprintf на компиляторе MSVC
+#include <cstdio>  // Поддержка sprintf
 
 // --- ФИЗИЧЕСКИЕ И ГЛОБАЛЬНЫЕ СТРУКТУРЫ ---
 
@@ -53,6 +53,7 @@ GroupConfig groups[6] = {
 };
 
 const std::vector<std::string> groupNames = { "yellow", "red", "green", "blue", "purple", "orange" };
+const std::unordered_map<std::string, int> groupIndexMap = { {"yellow", 0}, {"red", 1}, {"green", 2}, {"blue", 3}, {"purple", 4}, {"orange", 5} };
 
 std::vector<Particle> particles;
 std::vector<int> gridHead;
@@ -336,7 +337,7 @@ void updatePhysics() {
                             force = repelVal * (dist * invMinRadiusMatrixFlat[lookupIdx] - 1.0f);
                         } else {
                             float rule = ruleMatrixFlat[lookupIdx];
-                            float mid = (minRadius + maxRadius) * 0.5f;
+                            float mid = midMatrixFlat[lookupIdx];
                             float slope = slopeMatrixFlat[lookupIdx];
                             float diff = dist - mid;
                             force = -(slope * (diff >= 0.0f ? diff : -diff)) + rule;
