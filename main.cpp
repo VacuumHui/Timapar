@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <GLFW/glfw3.h>
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -93,17 +94,16 @@ uint32_t seedVal = 123456;
 uint32_t currentSeed = 123456;
 char seedInputBuf[64] = "123456";
 
-uint32_t MathImul(uint32_t a, uint32_t b) {
-    uint64_t result = (uint64_t)a * (uint64_t)b;
-    return (uint32_t)(result & 0xFFFFFFFF);
+uint32_t mulberry32() {
+    currentSeed += 0x6D2B79F5;
+    uint32_t t = currentSeed;
+    t = (t ^ (t >> 15)) * (t | 1);
+    t ^= t + (t ^ (t >> 7)) * (t | 61);
+    return t ^ (t >> 14);
 }
 
 float nextRand() {
-    currentSeed += 0x6D2B79F5;
-    uint32_t t = currentSeed;
-    t = MathImul(t ^ (t >> 15), t | 1);
-    t ^= t + MathImul(t ^ (t >> 7), t | 61);
-    return (float)(t ^ (t >> 14)) / 4294967296.0f;
+    return (float)mulberry32() / 4294967296.0f;
 }
 
 uint32_t hashString(const std::string& str) {
@@ -177,7 +177,7 @@ void populateParticles() {
 
     for (int i = 0; i < 6; i++) {
         int countForThisGroup = (int)std::floor(groups[i].count * scale);
-        for (int c = 0; i < 6 && c < countForThisGroup; c++) {
+        for (int c = 0; c < countForThisGroup; c++) {
             if (particles.size() >= maxLimit) break;
             Particle p;
             p.x = nextRand() * (config.width - 20) + 10;
@@ -232,6 +232,12 @@ void applySeed(const std::string& seedStr) {
     currentSeed = rulesSeed;
     randomizeRulesInternal();
 
+    currentSeed = positionsSeed;
+    populateParticles();
+}
+
+void resetSimulation() {
+    uint32_t positionsSeed = hashString(std::string(seedInputBuf) + "_positions");
     currentSeed = positionsSeed;
     populateParticles();
 }
@@ -324,7 +330,7 @@ void updatePhysics() {
                             force = repelVal * (dist * invMinRadiusMatrixFlat[lookupIdx] - 1.0f);
                         } else {
                             float rule = ruleMatrixFlat[lookupIdx];
-                            float mid = midMatrixFlat[lookupIdx];
+                            float mid = (minRadius + maxRadius) * 0.5f;
                             float slope = slopeMatrixFlat[lookupIdx];
                             float diff = dist - mid;
                             force = -(slope * (diff >= 0.0f ? diff : -diff)) + rule;
@@ -485,7 +491,7 @@ void drawImGuiInterface() {
     }
     ImGui::SameLine();
     if (ImGui::Button("Новый сид")) {
-        seedVal = MathImul(seedVal + 37, 1234567);
+        seedVal = (seedVal + 37) * 1234567;
         sprintf(seedInputBuf, "%u", seedVal);
         applySeed(std::string(seedInputBuf));
     }
@@ -527,13 +533,13 @@ void drawImGuiInterface() {
     }
     ImGui::SameLine();
     if (ImGui::Button("Случайные свойства")) {
-        seedVal = MathImul(seedVal + 11, 8887);
+        seedVal = (seedVal + 11) * 8887;
         sprintf(seedInputBuf, "%u", seedVal);
         applySeed(std::string(seedInputBuf));
     }
     ImGui::SameLine();
     if (ImGui::Button("Случайное количество")) {
-        seedVal = MathImul(seedVal + 99, 1313);
+        seedVal = (seedVal + 99) * 1313;
         sprintf(seedInputBuf, "%u", seedVal);
         applySeed(std::string(seedInputBuf));
     }
