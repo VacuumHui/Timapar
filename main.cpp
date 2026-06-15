@@ -8,7 +8,7 @@
 #include <string>
 #include <algorithm>
 #include <chrono>
-#include <cstdio>  // Обязательный заголовочный файл для sprintf на компиляторе MSVC
+#include <cstdio>  // Поддержка sprintf
 
 // --- ФИЗИЧЕСКИЕ И ГЛОБАЛЬНЫЕ СТРУКТУРЫ ---
 
@@ -479,7 +479,7 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
     else if (yoffset < 0.0) camera.targetZoom *= 0.85f;
 }
 
-// --- ПОСТРОЕНИЕ ИНТЕРФЕЙСА IMGUI (100% ВАШИ СЛАЙДЕРЫ И ГРУППЫ) ---
+// --- ПОСТРОЕНИЕ ИНТЕРФЕЙСА IMGUI ---
 
 void drawImGuiInterface() {
     ImGui_ImplOpenGL2_NewFrame();
@@ -504,7 +504,7 @@ void drawImGuiInterface() {
 
     ImGui::Separator();
     
-    // Динамический размер поля (то, о чем договаривались во 2-м пункте)
+    // Динамический размер поля
     ImGui::Text("Границы сцены (Размер поля):");
     if (ImGui::SliderInt("Ширина поля", &config.width, 200, 3000)) {
         initSpatialGrid();
