@@ -8,7 +8,7 @@
 #include <string>
 #include <algorithm>
 #include <chrono>
-#include <cstdio>  // Поддержка sprintf
+#include <cstdio>  // Обязательный заголовочный файл для sprintf на компиляторе MSVC
 
 // --- ФИЗИЧЕСКИЕ И ГЛОБАЛЬНЫЕ СТРУКТУРЫ ---
 
@@ -53,7 +53,6 @@ GroupConfig groups[6] = {
 };
 
 const std::vector<std::string> groupNames = { "yellow", "red", "green", "blue", "purple", "orange" };
-const std::unordered_map<std::string, int> groupIndexMap = { {"yellow", 0}, {"red", 1}, {"green", 2}, {"blue", 3}, {"purple", 4}, {"orange", 5} };
 
 std::vector<Particle> particles;
 std::vector<int> gridHead;
