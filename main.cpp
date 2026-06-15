@@ -8,6 +8,7 @@
 #include <string>
 #include <algorithm>
 #include <chrono>
+#include <cstdio>  // Обязательный заголовочный файл для sprintf на компиляторе MSVC
 
 // --- ФИЗИЧЕСКИЕ И ГЛОБАЛЬНЫЕ СТРУКТУРЫ ---
 
@@ -80,6 +81,11 @@ struct Camera {
     float targetOffsetY = 0.0f;
     float targetZoom = 1.0f;
 } camera;
+
+// Встроенная функция линейной интерполяции для C++17
+inline float lerp(float start, float end, float amt) {
+    return (1.0f - amt) * start + amt * end;
+}
 
 // Переменные профайлера
 float benchGridBuild = 0.0f;
