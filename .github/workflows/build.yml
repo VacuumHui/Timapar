@@ -1,0 +1,26 @@
+name: CMake Build (Windows .EXE)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Configure CMake
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --config Release
+
+    - name: Upload Executable Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ParticleSimulation-Windows
+        path: ${{github.workspace}}/build/Release/simulation.exe
