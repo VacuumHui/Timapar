@@ -4,7 +4,7 @@ project(ParticleSimulation)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Отключение предупреждений о небезопасных функциях (типа sprintf) во всем проекте
+# Отключение предупреждений о функциях Си (sprintf) во всем проекте
 add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
 
 # Автоматическое скачивание GLFW из GitHub
@@ -20,11 +20,10 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(glfw)
 
-# Автоматическое скачивание Dear ImGui
+# Быстрая и безопасная загрузка Dear ImGui через ZIP (без сбоев Git)
 FetchContent_Declare(
   imgui
-  GIT_REPOSITORY https://github.com/ocornut/imgui.git
-  GIT_TAG v1.89.9
+  URL https://github.com/ocornut/imgui/archive/refs/tags/v1.89.9.zip
 )
 FetchContent_GetProperties(imgui)
 if(NOT imgui_POPULATED)
@@ -55,6 +54,4 @@ target_link_libraries(simulation glfw)
 
 if(WIN32)
     target_link_libraries(simulation opengl32)
-    # Настройка скрытия консоли Windows для запуска чистого интерфейса
-    set_target_properties(simulation PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
 endif()
