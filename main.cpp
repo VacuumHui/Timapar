@@ -50,25 +50,18 @@ float cameraOffsetX = 0.0f;
 float cameraOffsetY = 0.0f;
 bool isPaused = false;
 
-// Быстрый генератор случайных чисел
+// Быстрый генератор случайных чисел на C++
 uint32_t seed = 12345;
 uint32_t mulberry32() {
     seed += 0x6D2B79F5;
     uint32_t t = seed;
-    t = MathImul(t ^ (t >> 15), t | 1);
-    t ^= t + MathImul(t ^ (t >> 7), t | 61);
-    return (t ^ (t >> 14)) >>> 0; // Аналог в C++ ниже
+    t = (t ^ (t >> 15)) * (t | 1);
+    t ^= t + (t ^ (t >> 7)) * (t | 61);
+    return t ^ (t >> 14);
 }
-uint32_t MathImul(uint32_t a, uint32_t b) {
-    uint64_t result = (uint64_t)a * (uint64_t)b;
-    return (uint32_t)(result & 0xFFFFFFFF);
-}
+
 float nextRand() {
-    seed += 0x6D2B79F5;
-    uint32_t t = seed;
-    t = MathImul(t ^ (t >> 15), t | 1);
-    t ^= t + MathImul(t ^ (t >> 7), t | 61);
-    return (float)t / 4294967296.0f;
+    return (float)mulberry32() / 4294967296.0f;
 }
 
 void randomizeRules() {
@@ -128,7 +121,7 @@ void updatePhysics() {
         for (int dy = -2; dy <= 2; dy++) {
             int cy = cellY + dy;
             if (cy < 0 || cy >= gridRows) continue;
-            for (int dx = -2; dy <= 2; dx++) { // Опечатка dx исправлена ниже в цикле поиска
+            for (int dx = -2; dx <= 2; dx++) { // Исправлена опечатка dx
                 int cx = cellX + dx;
                 if (cx < 0 || cx >= gridCols) continue;
 
