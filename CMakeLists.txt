@@ -17,15 +17,18 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(glfw)
 
-# Автоматическое скачивание Dear ImGui из GitHub
+# Автоматическое скачивание Dear ImGui (Без вызова MakeAvailable во избежание ошибок сборки)
 FetchContent_Declare(
   imgui
   GIT_REPOSITORY https://github.com/ocornut/imgui.git
   GIT_TAG v1.89.9
 )
-FetchContent_MakeAvailable(imgui)
+FetchContent_GetProperties(imgui)
+if(NOT imgui_POPULATED)
+  FetchContent_Populate(imgui)
+endif()
 
-# Набор исходных файлов Dear ImGui для сборщика
+# Набор исходных файлов Dear ImGui для компиляции
 set(IMGUI_SRCS
   ${imgui_SOURCE_DIR}/imgui.cpp
   ${imgui_SOURCE_DIR}/imgui_demo.cpp
@@ -39,7 +42,7 @@ set(IMGUI_SRCS
 # Компиляция исполняемого файла
 add_executable(simulation main.cpp ${IMGUI_SRCS})
 
-# Указание папок заголовков
+# Указание папок заголовков ImGui
 target_include_directories(simulation PRIVATE
   ${imgui_SOURCE_DIR}
   ${imgui_SOURCE_DIR}/backends
@@ -49,6 +52,6 @@ target_link_libraries(simulation glfw)
 
 if(WIN32)
     target_link_libraries(simulation opengl32)
-    # Скрытие консоли Windows, запуск приложения как чистого оконного процесса
+    # Настройка бесшумного запуска без командной строки в Windows
     set_target_properties(simulation PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
 endif()
